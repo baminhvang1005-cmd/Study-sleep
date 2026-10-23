@@ -1,0 +1,404 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudySleep - Học tập cân bằng</title>
+<style>
+:root {
+  --bg: #f4f7fb;
+  --card: #ffffff;
+  --text: #233047;
+  --muted: #718096;
+  --primary: #5278e8;
+  --green: #16866a;
+  --border: #e4eaf3;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+header {
+  padding: 24px 18px;
+  background: linear-gradient(135deg,#5278e8,#8b79e8);
+  color: white;
+  border-radius: 0 0 24px 24px;
+}
+header h1 { margin: 0 0 8px; font-size: 25px; }
+header p { margin: 0; line-height: 1.5; }
+main {
+  max-width: 650px;
+  margin: auto;
+  padding: 16px;
+}
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 17px;
+  padding: 17px;
+  margin-bottom: 16px;
+}
+h2 { margin: 0 0 14px; font-size: 19px; }
+label {
+  display: block;
+  font-size: 14px;
+  margin: 12px 0 6px;
+  font-weight: bold;
+}
+input, select, button {
+  font: inherit;
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+}
+input, select {
+  border: 1px solid #d8e0ed;
+  background: white;
+  color: var(--text);
+}
+button {
+  border: none;
+  background: var(--primary);
+  color: white;
+  font-weight: bold;
+  margin-top: 12px;
+  cursor: pointer;
+}
+button:active { opacity: .8; }
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.stat {
+  background: #eef2ff;
+  padding: 14px;
+  border-radius: 13px;
+}
+.stat strong {
+  display: block;
+  font-size: 25px;
+  margin-top: 7px;
+}
+.small { color: var(--muted); font-size: 13px; }
+.task {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  margin-top: 10px;
+}
+.task-top {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+}
+.task input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+}
+.task-info { flex: 1; min-width: 0; }
+.task-name { font-weight: bold; overflow-wrap: anywhere; }
+.done { text-decoration: line-through; color: var(--muted); }
+.meta { font-size: 12px; color: var(--muted); margin-top: 6px; }
+.delete {
+  width: auto;
+  padding: 7px 10px;
+  margin: 0;
+  background: #fff0f0;
+  color: #bd3e3e;
+}
+.bar {
+  height: 9px;
+  border-radius: 10px;
+  background: #e8edf5;
+  overflow: hidden;
+  margin-top: 12px;
+}
+#progressBar {
+  height: 100%;
+  width: 0;
+  background: var(--green);
+  transition: width .2s;
+}
+.result {
+  margin-top: 13px;
+  padding: 13px;
+  background: #eef8f3;
+  border-radius: 12px;
+  line-height: 1.6;
+}
+footer {
+  text-align: center;
+  padding: 10px 20px 28px;
+  color: var(--muted);
+  font-size: 12px;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>StudySleep 🌙</h1>
+  <p>Học tập có kế hoạch, ngủ đủ giấc, sống cân bằng.</p>
+</header>
+
+<main>
+  <section class="card">
+    <h2>📊 Tiến độ hôm nay</h2>
+    <div class="stats">
+      <div class="stat">
+        <span class="small">Tổng bài tập</span>
+        <strong id="total">0</strong>
+      </div>
+      <div class="stat">
+        <span class="small">Đã hoàn thành</span>
+        <strong id="completed">0</strong>
+      </div>
+    </div>
+    <div class="bar"><div id="progressBar"></div></div>
+    <p id="progressText" class="small">Hãy thêm bài tập để bắt đầu.</p>
+  </section>
+
+  <section class="card">
+    <h2>📝 Quản lý bài tập</h2>
+    <form id="taskForm">
+      <label for="taskName">Tên bài tập</label>
+      <input id="taskName" placeholder="Ví dụ: Làm 20 câu Toán"
+        maxlength="150" required>
+
+      <label for="subject">Môn học</label>
+      <select id="subject">
+        <option>Toán</option>
+        <option>Ngữ văn</option>
+        <option>Tiếng Anh</option>
+        <option>Vật lí</option>
+        <option>Hóa học</option>
+        <option>Sinh học</option>
+        <option>Lịch sử</option>
+        <option>Địa lí</option>
+        <option>Tin học</option>
+        <option>Khác</option>
+      </select>
+
+      <label for="priority">Mức độ ưu tiên</label>
+      <select id="priority">
+        <option value="Cao">Cao</option>
+        <option value="Vừa" selected>Vừa</option>
+        <option value="Thấp">Thấp</option>
+      </select>
+
+      <label for="deadline">Hạn hoàn thành</label>
+      <input id="deadline" type="date">
+
+      <button type="submit">+ Thêm bài tập</button>
+    </form>
+    <div id="taskList"></div>
+  </section>
+
+  <section class="card">
+    <h2>🌙 Kế hoạch giấc ngủ</h2>
+    <label for="bedtime">Giờ đi ngủ mục tiêu</label>
+    <input id="bedtime" type="time" value="22:00">
+
+    <label for="wakeTime">Giờ thức dậy</label>
+    <input id="wakeTime" type="time" value="06:00">
+
+    <button id="saveSleep" type="button">Lưu kế hoạch ngủ</button>
+    <div class="result" id="sleepResult">
+      Thời lượng ngủ dự kiến: 8 giờ.
+    </div>
+    <p class="small">
+      Đây là thời gian nằm ngủ dự kiến, chưa trừ thời gian cần để đi vào giấc ngủ.
+      Thanh thiếu niên thường cần ngủ khoảng 8–10 giờ mỗi đêm.
+    </p>
+  </section>
+
+  <section class="card">
+    <h2>💡 Nhắc nhở</h2>
+    <p>• Ưu tiên bài tập quan trọng và gần hạn.</p>
+    <p>• Nghỉ ngắn giữa các phiên học.</p>
+    <p>• Tránh để bài tập kéo dài làm ảnh hưởng giờ ngủ.</p>
+    <p>• Cố gắng giữ giờ ngủ và thức dậy ổn định.</p>
+  </section>
+</main>
+
+<footer>
+  StudySleep · Phiên bản 1.0 · Học tập cân bằng
+</footer>
+
+<script>
+const $ = id => document.getElementById(id);
+const STORAGE_KEY = "studysleep_tasks_v1";
+const SLEEP_KEY = "studysleep_sleep_v1";
+
+let tasks = [];
+try {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  tasks = saved ? JSON.parse(saved) : [];
+  if (!Array.isArray(tasks)) tasks = [];
+} catch (e) {
+  tasks = [];
+}
+
+function saveTasks() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+  } catch (e) {
+    alert("Không thể lưu dữ liệu. Hãy kiểm tra bộ nhớ trình duyệt.");
+  }
+}
+
+function renderTasks() {
+  const list = $("taskList");
+  list.innerHTML = "";
+
+  if (tasks.length === 0) {
+    list.innerHTML =
+      '<p class="small">Chưa có bài tập. Hãy thêm bài đầu tiên!</p>';
+  }
+
+  tasks.forEach(task => {
+    const item = document.createElement("div");
+    item.className = "task";
+
+    const row = document.createElement("div");
+    row.className = "task-top";
+
+    const check = document.createElement("input");
+    check.type = "checkbox";
+    check.checked = task.done;
+    check.setAttribute("aria-label", "Hoàn thành bài tập");
+    check.addEventListener("change", () => {
+      task.done = check.checked;
+      saveTasks();
+      renderTasks();
+    });
+
+    const info = document.createElement("div");
+    info.className = "task-info";
+
+    const name = document.createElement("div");
+    name.className = "task-name" + (task.done ? " done" : "");
+    name.textContent = task.name;
+
+    const meta = document.createElement("div");
+    meta.className = "meta";
+    meta.textContent = task.subject + " · Ưu tiên: " +
+      task.priority + (task.deadline ? " · Hạn: " + task.deadline : "");
+
+    info.append(name, meta);
+
+    const del = document.createElement("button");
+    del.className = "delete";
+    del.type = "button";
+    del.textContent = "Xóa";
+    del.addEventListener("click", () => {
+      tasks = tasks.filter(t => t.id !== task.id);
+      saveTasks();
+      renderTasks();
+    });
+
+    row.append(check, info, del);
+    item.appendChild(row);
+    list.appendChild(item);
+  });
+
+  const done = tasks.filter(t => t.done).length;
+  $("total").textContent = tasks.length;
+  $("completed").textContent = done;
+  const percent = tasks.length ? Math.round(done / tasks.length * 100) : 0;
+  $("progressBar").style.width = percent + "%";
+  $("progressText").textContent = tasks.length
+    ? "Hoàn thành " + percent + "% công việc."
+    : "Hãy thêm bài tập để bắt đầu.";
+}
+
+$("taskForm").addEventListener("submit", event => {
+  event.preventDefault();
+
+  const name = $("taskName").value.trim();
+  if (!name) return;
+
+  tasks.push({
+    id: Date.now().toString() + Math.random().toString(16).slice(2),
+    name,
+    subject: $("subject").value,
+    priority: $("priority").value,
+    deadline: $("deadline").value,
+    done: false
+  });
+
+  saveTasks();
+  renderTasks();
+  $("taskName").value = "";
+  $("taskName").focus();
+});
+
+function calculateSleep() {
+  const bed = $("bedtime").value;
+  const wake = $("wakeTime").value;
+
+  if (!bed || !wake) {
+    $("sleepResult").textContent = "Hãy chọn cả giờ ngủ và giờ thức dậy.";
+    return;
+  }
+
+  const toMinutes = time => {
+    const parts = time.split(":").map(Number);
+    return parts[0] * 60 + parts[1];
+  };
+
+  let minutes = toMinutes(wake) - toMinutes(bed);
+  if (minutes <= 0) minutes += 24 * 60;
+
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+
+  let advice = "";
+  if (minutes < 8 * 60) {
+    advice = " Thời lượng này thấp hơn mức 8–10 giờ thường được khuyến nghị cho thanh thiếu niên.";
+  } else if (minutes > 10 * 60) {
+    advice = " Thời lượng này dài hơn khoảng 8–10 giờ thường được khuyến nghị cho thanh thiếu niên.";
+  } else {
+    advice = " Thời lượng nằm trong khoảng 8–10 giờ thường được khuyến nghị cho thanh thiếu niên.";
+  }
+
+  $("sleepResult").textContent =
+    "Thời lượng ngủ dự kiến: " + hours + " giờ " +
+    mins + " phút." + advice;
+}
+
+function saveSleepPlan() {
+  const plan = {
+    bedtime: $("bedtime").value,
+    wakeTime: $("wakeTime").value
+  };
+  try {
+    localStorage.setItem(SLEEP_KEY, JSON.stringify(plan));
+  } catch (e) {
+    alert("Không thể lưu kế hoạch ngủ.");
+    return;
+  }
+  calculateSleep();
+}
+
+$("saveSleep").addEventListener("click", saveSleepPlan);
+
+try {
+  const sleep = JSON.parse(localStorage.getItem(SLEEP_KEY) || "null");
+  if (sleep) {
+    if (sleep.bedtime) $("bedtime").value = sleep.bedtime;
+    if (sleep.wakeTime) $("wakeTime").value = sleep.wakeTime;
+  }
+} catch (e) {}
+
+calculateSleep();
+renderTasks();
+</script>
+</body>
+</html>
